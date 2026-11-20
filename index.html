@@ -271,7 +271,7 @@
                 }
 
                 const matchedStudent = data.student;
-                const midsem30 = Math.round((matchedStudent.midsem / 0.6) * 100) / 100;
+                const midsem30 = Math.round((matchedStudent.midsem * 0.6) * 100) / 100;
                 const total = matchedStudent.quiz1 + matchedStudent.quiz2 + matchedStudent.quiz3 + matchedStudent.assignment + midsem30;
 
                 document.getElementById("quiz1Cell").textContent = matchedStudent.quiz1 == 0 ? "AB" : matchedStudent.quiz1;
