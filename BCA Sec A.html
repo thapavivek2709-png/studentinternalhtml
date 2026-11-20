@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Marks</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: "Times New Roman", Times, serif;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background-color: #333333;
+            width: 80%;
+            opacity: 0.5;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        input,
+        button {
+            width: 280px;
+            padding: 6px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            border: 1px solid #767676;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #efefef;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .note {
+            color: red;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        #result {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        #resultContainer {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .grade-table {
+            width: 340px;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .grade-table th,
+        .grade-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 15px;
+        }
+
+        .grade-table th {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .grade-table th:last-child,
+        .grade-table td:last-child {
+            text-align: right;
+        }
+
+        /* Subtle alternating row shading */
+        .grade-table tbody tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+
+        /* Hover highlight */
+        .grade-table tbody tr:hover {
+            background-color: #e0e7ff;
+        }
+
+        /* Styled Total row */
+        .grade-table tfoot td {
+            font-weight: bold;
+            background-color: #dbeafe;
+            color: #1e3a8a;
+            border-top: 2px solid #1e3a8a;
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>INTERNAL MARKS</h1>
+    <hr>
+    <main>
+        <form id="userForm" novalidate>
+            <label for="regdNo">Registration Number</label>
+            <input type="number" id="regdNo" name="regdNo">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email">
+
+            <label for="phone">Phone Number</label>
+            <input type="number" id="phone" name="phone">
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob">
+
+            <button type="submit" id="submitBtn">View</button>
+
+            <p id="errorMsg" class="note">* Note all fields are required!</p>
+        </form>
+
+        <div id="resultContainer">
+            <h2>Result</h2>
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th>Assessment</th>
+                        <th>Marks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A. Quiz I (5)</td>
+                        <td id="quiz1Cell">-</td>
+                    </tr>
+                    <tr>
+                        <td>B. Quiz II (5)</td>
+                        <td id="quiz2Cell">-</td>
+                    </tr>
+                    <tr>
+                        <td>C. Quiz III (5)</td>
+                        <td id="quiz3Cell">-</td>
+                    </tr>
+                    <tr>
+                        <td>D. Assignment (5)</td>
+                        <td id="assignmentCell">-</td>
+                    </tr>
+                    <tr>
+                        <td>E. Mid Term (50)</td>
+                        <td id="midsem50Cell">-</td>
+                    </tr>
+                    <tr>
+                        <td>F. Mid Term (30)</td>
+                        <td id="midsem30Cell">-</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total [A+B+C+D+F] (50)</td>
+                        <td id="totalCell">-</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwk6EX4tLu7Gy02NAv7QWFuqTh3z5UBHQWVjIoyg1Jlvab-XZaUMU8zwAni9yfFCvj7/exec";
+
+        document.getElementById("userForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const phone = document.getElementById("phone").value.trim();
+            const regdNo = document.getElementById("regdNo").value.trim();
+            const dob = document.getElementById("dob").value;
+            const errorMsg = document.getElementById("errorMsg");
+            const resultContainer = document.getElementById("resultContainer");
+            const submitBtn = document.getElementById("submitBtn");
+
+            errorMsg.style.color = "red";
+
+            if (!regdNo || !email || !phone || !dob) {
+                errorMsg.textContent = "* Error: All fields are required!";
+                resultContainer.style.display = "none";
+                return;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                errorMsg.textContent = "* Error: Please enter a valid email address.";
+                resultContainer.style.display = "none";
+                return;
+            }
+
+            const regdnopattern = /^[0-9]{9}$/;
+            if (!regdnopattern.test(regdNo)) {
+                errorMsg.textContent = "* Error: Please enter a valid 9-digit registration number.";
+                resultContainer.style.display = "none";
+                return;
+            }
+
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(phone)) {
+                errorMsg.textContent = "* Error: Please enter a valid 10-digit phone number.";
+                resultContainer.style.display = "none";
+                return;
+            }
+
+            const selectedDate = new Date(dob);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate >= today) {
+                errorMsg.textContent = "* Error: Date of Birth must be in the past.";
+                resultContainer.style.display = "none";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Checking...";
+            errorMsg.style.color = "#1e3a8a";
+            errorMsg.textContent = "Fetching record...";
+            resultContainer.style.display = "none";
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ regdNo, email, phone, dob })
+                });
+
+                const data = await response.json();
+
+                if (!data.found) {
+                    errorMsg.style.color = "red";
+                    errorMsg.textContent = "* Error: No matching record found!";
+                    resultContainer.style.display = "none";
+                    return;
+                }
+
+                const matchedStudent = data.student;
+                const midsem30 = Math.round((matchedStudent.midsem / 50) * 30);
+                const total = matchedStudent.quiz1 + matchedStudent.quiz2 + matchedStudent.quiz3 + matchedStudent.assignment + midsem30;
+
+                document.getElementById("quiz1Cell").textContent = matchedStudent.quiz1 == 0 ? "AB" : matchedStudent.quiz1;
+                document.getElementById("quiz2Cell").textContent = matchedStudent.quiz2 == 0 ? "AB" : matchedStudent.quiz2;
+                document.getElementById("quiz3Cell").textContent = matchedStudent.quiz3 == 0 ? "AB" : matchedStudent.quiz3;
+                document.getElementById("assignmentCell").textContent = matchedStudent.assignment == 0 ? "AB" : matchedStudent.assignment;
+                document.getElementById("midsem50Cell").textContent = matchedStudent.midsem == 0 ? "AB" : matchedStudent.midsem;
+                document.getElementById("midsem30Cell").textContent = midsem30;
+                document.getElementById("totalCell").textContent = total;
+
+                errorMsg.style.color = "green";
+                errorMsg.textContent = "Record found!";
+                resultContainer.style.display = "block";
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                errorMsg.style.color = "red";
+                errorMsg.textContent = "* Error: Could not connect to server. Try again.";
+                resultContainer.style.display = "none";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "View";
+            }
+        });
+
+    </script>
+</body>
+
+</html>
