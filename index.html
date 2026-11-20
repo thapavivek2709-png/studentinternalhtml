@@ -151,7 +151,7 @@
         </form>
 
         <div id="resultContainer">
-            <h2>Result</h2>
+            <h2><span id="name"></span> Result</h2>
             <table class="grade-table">
                 <thead>
                     <tr>
@@ -281,6 +281,8 @@
                 document.getElementById("midsem50Cell").textContent = matchedStudent.midsem == 0 ? "AB" : matchedStudent.midsem;
                 document.getElementById("midsem30Cell").textContent = midsem30;
                 document.getElementById("totalCell").textContent = total;
+
+                document.getElementById("name").textContent = matchedStudent.quiz1.trim();
 
                 errorMsg.style.color = "green";
                 errorMsg.textContent = "Record found!";
